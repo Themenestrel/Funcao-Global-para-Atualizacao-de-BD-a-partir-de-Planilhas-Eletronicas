@@ -1,0 +1,37 @@
+import pandas as pd
+import sqlite3 as lite
+import numpy as np
+
+#Conecta no BD e instancia o cursor
+con = lite.connect('Nome_do_BD')
+cur = con.cursor()
+
+#Abre a Planilha Principal
+planilha_total = pd.ExcelFile(r"C:\\Python\\Matriz_Planejamento\\Matrizes_-_Banco_Access.xls")
+
+#Instancia as Abas da Planilha
+aba_objeto = pd.read_excel(planilha_total, 'Objeto')
+aba_questao = pd.read_excel(planilha_total, 'Questão')
+aba_informacao_requerida = pd.read_excel(planilha_total, 'Informação Requerida')
+aba_fonte_informacao = pd.read_excel(planilha_total, 'Fonte de Informação')
+aba_tecnicas = pd.read_excel(planilha_total, 'Tecnicas')
+aba_possiveis_achados = pd.read_excel(planilha_total, 'Possiveis Achados')
+aba_criterios = pd.read_excel(planilha_total, 'Critérios')
+
+#Declara a função de Inserir Dados no BD
+def inserir_bd(array_aba, nome_tabela, id_tabela, descricao_tabela):
+    for i in np.array(array_aba):
+        cur.execute(f'INSERT OR IGNORE INTO {nome_tabela} ({id_tabela}, {descricao_tabela}) VALUES(?, ?)', (i[0], i[1]))
+        con.commit()
+
+#Chama a função passando os parâmetros necessários
+inserir_bd(aba_objeto, 'Objeto', 'id_objeto', 'objeto')
+inserir_bd(aba_questao, 'questao', 'id_questao', 'questao')
+inserir_bd(aba_informacao_requerida, 'Informacao_requerida', 'id_informacao_requerida', 'informacao_requerida')
+inserir_bd(aba_fonte_informacao, 'Fontes_de_Informacao', 'id_fontes_informacao', 'fontes_informacao')
+inserir_bd(aba_tecnicas, 'tecnicas', 'id_tecnicas', 'tecnicas')
+inserir_bd(aba_possiveis_achados, 'Possiveis_achados', 'id_possiveis_achados', 'possiveis_achados')
+inserir_bd(aba_criterios, 'criterios', 'id_criterios', 'criterios')
+
+#Fecha a conexão com o BD
+con.close()
